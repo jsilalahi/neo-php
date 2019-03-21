@@ -1,0 +1,20 @@
+{
+    "name": "dyned/neo-php",
+    "description": "Official Neo PHP SDK",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jogi Silalahi",
+            "email": "jsilalahi@dyned.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Neo\\": "src/"
+        }
+    },
+    "require": {
+        "guzzlehttp/guzzle": "^6.3"
+    }
+}
