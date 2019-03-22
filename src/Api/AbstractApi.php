@@ -2,8 +2,6 @@
 
 namespace DynEd\Neo\Api;
 
-use DynEd\Neo\HttpClient\HttpClientInterface;
-
 abstract class AbstractApi
 {
     /** @var HttpClientInterface */
@@ -11,9 +9,6 @@ abstract class AbstractApi
 
     /** @var string */
     protected $baseUri;
-
-    /** @var string */
-    protected $rawResponse;
 
     /**
      * AbstractApi constructor
