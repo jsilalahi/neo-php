@@ -1,7 +1,17 @@
+# PHP Library for Neo API Ecosystem
 
+NOTE: Still on heavy development. Do not use on production yet.
 
+## Installation
 
-## Token Request
+The easiest way to install is using composer
+```
+composer require dyned/neo-php
+
+```
+That's it!
+
+## Token Request API
 
 Below are example to using Token Request.
 ```php
@@ -12,10 +22,10 @@ use DynEd\Neo\Token\TokenRequestApi;
 
 // Using TokenRequestApi instance
 $api = new TokenRequestApi();
-$api->setBaseUri("http://dyned.com/base/uri/to/jwt")
+$api->setBaseUri("http://host.test/endpoint")
     ->setCredential([
-        'username' => $this->username,
-        'password' => $this->password
+        'username' => $username,
+        'password' => $password
     ]);
                 
 $token = $api->request();
@@ -24,10 +34,10 @@ $token = $api->request();
 
 // Or using method chain
 $token = (new TokenRequestApi())
-         ->setBaseUri("http://dyned.com/base/uri/to/jwt")
+         ->setBaseUri("http://host.test/endpoint")
          ->setCredential([
-             'username' => $this->username,
-             'password' => $this->password
+             'username' => $username,
+             'password' => $password
          ])
          ->request();
          
