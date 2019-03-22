@@ -1,8 +1,8 @@
 <?php
 
-namespace Neo\Api;
+namespace DynEd\Neo\Api;
 
-use Neo\HttpClient\HttpClientInterface;
+use DynEd\Neo\HttpClient\HttpClientInterface;
 
 abstract class AbstractApi
 {
@@ -10,17 +10,46 @@ abstract class AbstractApi
     protected $httpClient;
 
     /** @var string */
-    protected $baseUrl;
+    protected $baseUri;
+
+    /** @var string */
+    protected $rawResponse;
 
     /**
      * AbstractApi constructor
      *
      * @param HttpClientInterface $httpClient
-     * @param $baseUrl
+     * @param $baseUri
      */
-    public function __construct(HttpClientInterface $httpClient, $baseUrl)
+    public function __construct(HttpClientInterface $httpClient = null, $baseUri = null)
     {
         $this->httpClient = $httpClient;
-        $this->baseUrl = $baseUrl;
+        $this->baseUri = $baseUri;
+    }
+
+    /**
+     * Set HttpClient
+     *
+     * @param HttpClientInterface $httpClient
+     * @return $this
+     */
+    public function setHttpClient(HttpClientInterface $httpClient)
+    {
+        $this->httpClient = $httpClient;
+
+        return $this;
+    }
+
+    /**
+     * Set Base URI / Host
+     *
+     * @param $baseUri
+     * @return $this
+     */
+    public function setBaseUri($baseUri)
+    {
+        $this->baseUri = $baseUri;
+
+        return $this;
     }
 }

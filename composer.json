@@ -11,10 +11,12 @@
     ],
     "autoload": {
         "psr-4": {
-            "Neo\\": "src/"
+            "DynEd\\Neo\\": "src/"
         }
     },
     "require": {
-        "guzzlehttp/guzzle": "^6.3"
+        "ext-json": "*",
+        "guzzlehttp/guzzle": "^6.3",
+        "rakit/validation": "^1.1"
     }
 }

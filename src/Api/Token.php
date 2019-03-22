@@ -1,30 +1,46 @@
 <?php
 
-namespace Neo\Api;
+namespace DynEd\Neo\Api;
+
+use DynEd\Neo\Exceptions\ValidationException;
+use Rakit\Validation\Validator;
 
 class Token extends AbstractApi
 {
     /** @var string */
     const ENDPOINT_TOKEN_REQUEST = "/token-request";
 
-    /** @var string  */
+    /** @var string */
     const ENDPOINT_TOKEN_VERIFY = "/token-verify";
 
+
     /**
-     * Retrieve token
+     * Handle API request
      *
-     * @param $username
-     * @param $password
+     * @param array $credential
      * @return mixed|null
+     * @throws ValidationException
      */
-    public function retrieve($username, $password)
+    public function request(array $credential)
     {
+        // Credential validation
+        $validation = (new Validator)->validate($credential, [
+            'username' => 'required',
+            'password' => 'required',
+        ]);
+
+        // If the credential validation do not pass, then an exception will be thrown
+        if ($validation->fails()) {
+            throw new ValidationException("Given credential data does not pass validation");
+        }
+
+        // Send request
         $response = $this->httpClient->post(
-            sprintf('%s/%s', $this->baseUrl,self::ENDPOINT_TOKEN_REQUEST),
+            sprintf('%s/%s', $this->baseUri,self::ENDPOINT_TOKEN_REQUEST),
             [
                 'json' => [
-                    'username' => $username,
-                    'password' => $password
+                    'username' => $credential['username'],
+                    'password' => $credential['password']
                 ],
                 'headers' => [
                     'Content-Type' => 'application/json'
@@ -33,7 +49,9 @@ class Token extends AbstractApi
         );
 
         if ($response->getStatusCode() == '200') {
-            return json_decode($response->getBody()->getContents());
+             return new Token(
+                 json_decode($response->getBody()->getContents())->token
+             );
         }
 
         return null;

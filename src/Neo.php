@@ -1,10 +1,10 @@
 <?php
 
-namespace Neo;
+namespace DynEd\Neo;
 
-use Neo\Api\Token;
-use Neo\HttpClient\GuzzleHttpClient;
-use Neo\HttpClient\HttpClientInterface;
+use DynEd\Neo\Api\Token;
+use DynEd\Neo\HttpClient\GuzzleHttpClient;
+use DynEd\Neo\HttpClient\HttpClientInterface;
 
 class Neo {
 
@@ -19,7 +19,7 @@ class Neo {
         'client' => [
             'timeout'  => 5,
             'http_errors' => false
-        ],
+        ]
     ];
 
     /**
@@ -42,7 +42,7 @@ class Neo {
      * @param $host
      * @return Token
      */
-    public function token($host)
+    public function tokenRequest($host = '')
     {
         return new Token($this->httpClient, $host);
     }

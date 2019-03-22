@@ -1,6 +1,6 @@
 <?php
 
-namespace Neo\HttpClient;
+namespace DynEd\Neo\HttpClient;
 
 use GuzzleHttp\Client;
 
