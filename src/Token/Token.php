@@ -2,7 +2,7 @@
 
 namespace DynEd\Neo\Token;
 
-class TokenResource
+class Token
 {
     /** @var  */
     protected $token;

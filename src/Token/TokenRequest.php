@@ -6,7 +6,7 @@ use DynEd\Neo\Api\AbstractApi;
 use DynEd\Neo\Exceptions\ValidationException;
 use Rakit\Validation\Validator;
 
-class TokenRequestApi extends AbstractApi
+class TokenRequest extends AbstractApi
 {
     /** @var string */
     const ENDPOINT = "/token-request";
@@ -61,7 +61,7 @@ class TokenRequestApi extends AbstractApi
         );
 
         if ($response->getStatusCode() == '200') {
-             return new TokenResource(
+             return new Token(
                  json_decode($response->getBody()->getContents())->token
              );
         }
