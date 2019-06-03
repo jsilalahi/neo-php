@@ -12,103 +12,45 @@ That's it!
 
 ## Token API
 
-##### Token Request API
-
-Below are example to using Token Request API.
+### Token Request API
+Below are example using Token Request API.
 
 ```php
-<?php
-
-// Require autoload
+<?php 
 require "vendor/autoload.php";
 
-use DynEd\Neo\Token\TokenRequest;
+use Dyned\Neo\AccessToken\Verify;
 
-// Using TokenRequest instance
-$api = new TokenRequest();
-$api->setBaseUri("http://host.test/endpoint")
-    ->setCredential([
-        'username' => 'username',
-        'password' => 'password'
-    ]);
-                
-$token = $api->request();
-
-// Or using method chain
-$token = (new TokenRequest())
-         ->setBaseUri("http://host.test/endpoint")
-         ->setCredential([
-             'username' => 'username',
-             'password' => 'password'
-         ])
-         ->request();
-         
-// Use the token
-echo $token->getToken();
+$verify = new Verify('http://endpoint/SSO_ENDPOINT.test');
+$response = $verify->login([
+    'username' => 'email@gmail.com',
+    'password' => 'secret',
+]);
+var_dump($response);
 ```
 
-##### Token Verify API
-The token to verify should be an `DynEd\Neo\Token\Token` instance. The token can be retrieved from Token Request API, 
-or if you only has the token in string, you can wrap to Token instance
-
-Below are example to using Token Verify API.
-
+the `login` method return an array if the status code is 200 / validation correct
 ```php
-<?php
-
-// Require autoload
-require "vendor/autoload.php";
-
-use DynEd\Neo\Token\TokenRequest;
-use DynEd\Neo\Token\TokenVerify;
-use DynEd\Neo\Token\Token;
-
-// Retrieved from TokenRequest
-$token = (new TokenRequest())
-         ->setBaseUri("http://host.test/endpoint")
-         ->setCredential([
-             'username' => 'username',
-             'password' => 'password'
-         ])
-         ->request();
-
-// Or wrap to Token
-$token = new Token("xxx");
-
-// Then verify the token
-$isVerified = (new TokenVerify())
-            ->setBaseUri($this->baseUri)
-            ->setToken($token)
-            ->verify();
+    [
+        "username" => "string"
+        "password" => "string"
+        "dyned-token" => "string"
+        "user" => "object"
+    ]
 ```
+otherwise the response from login method will be null if failed.
+
+If you want to get the `dyned-token` simply use `$response['dyned-token']` to get the access token.
 
 
-## HTTP Client
-Neo PHP provides two HTTP Client out of the box, GuzzleHttp (`DynEd\Neo\Api\HttpClient\GuzzleHttpClient`) and cURL (`DynEd\Neo\Api\HttpClient\CurlHttpClient`) HttpClient.
-
-##### Using HTTP Client
-By default, if you are not states which HTTP Client to use in API, the library will using `GuzzleHttpClient`. To use specific client, passing the HttpClient in API instance.
-```php
-<?php
-
-use DynEd\Neo\Token\TokenRequest;
-use DynEd\Neo\Api\HttpClient\CurlHttpClient;
-
-// Using default HttpClient, GuzzleHttpClient
-$api = new TokenRequest();
-
-// Using CurlHttpClient
-$api = new TokenRequest(new CurlHttpClient);
-```
-
-##### Custom HTTP Client
+### Custom HTTP Client
 If you prefer to using your own HTTP Client, you need to implement the `DynEd\Neo\Api\HttpClientInterface` and write code for the `get`, `post`, `put`, `patch`, and `delete` method. 
 So the new HTTP Client would look something like this:
 
 ```php
 <?php
 
-use DynEd\Neo\Api\HttpClientInterface;
+use DynEd\Neo\HttpClients\HttpClientInterface;
 
 class CustomHttpClient implements HttpClientInterface
 {  
@@ -119,9 +61,3 @@ class CustomHttpClient implements HttpClientInterface
         public function delete($uri)  { /* Implement */ }
 }
 ```
-
-
-## Tests
-`./vendor/bin/phpunit --bootstrap vendor/autoload.php tests --do-not-cache-result ` 
-
-
