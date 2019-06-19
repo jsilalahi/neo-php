@@ -1,8 +1,9 @@
 <?php
 
-namespace DynEd\Neo\Api;
+namespace DynEd\Neo;
 
-use DynEd\Neo\Api\HttpClient\GuzzleHttpClient;
+use DynEd\Neo\HttpClients\GuzzleHttpClient;
+use DynEd\Neo\HttpClients\HttpClientInterface;
 
 abstract class AbstractApi
 {
@@ -10,18 +11,18 @@ abstract class AbstractApi
     protected $httpClient;
 
     /** @var string */
-    protected $baseUri;
+    protected $baseUrl;
 
     /**
      * AbstractApi constructor
      *
-     * @param HttpClientInterface $httpClient
-     * @param $baseUri
+     * @param $baseUrl
+     * @param $httpClient
      */
-    public function __construct(HttpClientInterface $httpClient = null, $baseUri = null)
+    public function __construct($baseUrl = null, HttpClientInterface $httpClient = null)
     {
+        $this->baseUrl = $baseUrl;
         $this->httpClient = ($httpClient) ?: new GuzzleHttpClient();
-        $this->baseUri = $baseUri;
     }
 
     /**
@@ -38,14 +39,14 @@ abstract class AbstractApi
     }
 
     /**
-     * Set Base URI / Host
+     * Set base URL
      *
-     * @param $baseUri
+     * @param $baseUrl
      * @return $this
      */
-    public function setBaseUri($baseUri)
+    public function setBaseUrl($baseUrl)
     {
-        $this->baseUri = $baseUri;
+        $this->baseUrl = $baseUrl;
 
         return $this;
     }
