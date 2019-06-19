@@ -6,9 +6,9 @@ use DynEd\Neo\Profile\Api as ProfileApi;
 
 class ProfileApiTest extends TestCase
 {
-    protected $baseUri = "https://b2ctest.id.dyned.com/api/v1/";
-    protected $username = "tebetutara2";
-    protected $password = "!@#DynEd12810*()";
+    protected $baseUri = "http://host.test/endpoint";
+    protected $username = "username";
+    protected $password = "password";
 
 
     public function testTokenProfile()

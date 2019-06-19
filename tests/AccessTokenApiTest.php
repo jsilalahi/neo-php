@@ -6,9 +6,9 @@ use DynEd\Neo\AccessToken\Token;
 
 class AccessTokenApiTest extends TestCase
 {
-    protected $baseUri = "https://b2ctest.dyned.com/api/v1/jwt";
-    protected $username = "tebetutara2";
-    protected $password = "!@#DynEd12810*()";
+    protected $baseUri = "http://host.test/endpoint";
+    protected $username = "username";
+    protected $password = "password";
 
     public function testLoginWithoutCredential()
     {
