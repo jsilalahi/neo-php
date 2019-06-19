@@ -9,6 +9,13 @@ class GuzzleHttpClient implements HttpClientInterface
     /** @var Client */
     private $client;
 
+    /** @var array */
+    private $config = [
+        'timeout'  => 5,
+        'http_errors' => false,
+        'verify' => false
+    ];
+
     /**
      * GuzzleHttpClient constructor
      *
@@ -17,11 +24,7 @@ class GuzzleHttpClient implements HttpClientInterface
     public function __construct(array $config = [])
     {
         $this->client = new Client(
-            array_merge($config, [
-                'timeout'  => 5,
-                'http_errors' => false,
-                'verify' => false
-            ])
+            array_merge($config, $this->config)
         );
     }
 

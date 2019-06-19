@@ -8,17 +8,18 @@ abstract class AbstractApi
     protected $httpClient;
 
     /** @var string */
-    protected $endpoint;
+    protected $baseUrl;
 
     /**
      * AbstractApi constructor
      *
-     * @param $endpoint
+     * @param $httpClient
+     * @param $baseUrl
      */
-    public function __construct($endpoint = null)
+    public function __construct(HttpClientInterface $httpClient, $baseUrl = null)
     {
-        $this->httpClient = new GuzzleHttpClient();
-        $this->endpoint = $endpoint;
+        $this->httpClient = $httpClient;
+        $this->baseUrl = $baseUrl;
     }
 
     /**
@@ -35,14 +36,14 @@ abstract class AbstractApi
     }
 
     /**
-     * Set endpoint
+     * Set base URL
      *
-     * @param $endpoint
+     * @param $baseUrl
      * @return $this
      */
-    public function setEndpoint($endpoint)
+    public function setBaseUrl($baseUrl)
     {
-        $this->endpoint = $endpoint;
+        $this->baseUrl = $baseUrl;
 
         return $this;
     }
