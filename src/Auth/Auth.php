@@ -1,26 +1,59 @@
 <?php
 
-namespace DynEd\Neo\AccessToken;
+namespace DynEd\Neo\Auth;
 
-use DynEd\Neo\AbstractApi;
+use DynEd\Neo\Exceptions\ConfigurationException;
 use DynEd\Neo\Exceptions\ValidationException;
+use DynEd\Neo\HttpClients\HttpClientInterface;
 use Rakit\Validation\Validator;
 
-class Api extends AbstractApi {
-
-    /** @var string */
-    const AUTH_ENDPOINT = "token-request";
-    const VERIFY_ENDPOINT = "token-verify";
+class Auth {
 
     /**
-     * Request access token
+     * SSO token request endpoint
+     *
+     * var @string
+     */
+    const TOKEN_REQUEST_ENDPOINT = "/api/v1/jwt/token-request";
+
+    /**
+     * SSO token verify endpoint
+     *
+     * var @string
+     */
+    const TOKEN_VERIFY_ENDPOINT = "/api/v1/jwt/token-verify";
+
+    /**
+     * Auth service provider
+     *
+     * @var Provider
+     */
+    private static $httpClient;
+
+    /**
+     * Setup
+     *
+     * @param HttpClientInterface $httpClient
+     */
+    public static function useHttpClient(HttpClientInterface $httpClient)
+    {
+        self::$httpClient = $httpClient;
+    }
+
+    /**
+     * Retrieve token from SSO for given credential
      *
      * @param array $credential
-     * @return mixed|null
+     * @return Token|null
+     * @throws ConfigurationException
      * @throws ValidationException
      */
-    public function login(array $credential = [])
+    public static function token(array $credential)
     {
+        if( ! self::$httpClient) {
+            throw new ConfigurationException("please setup HTTP client first");
+        }
+
         // Credential validation
         $validation = (new Validator)->validate($credential, [
             'username' => 'required',
@@ -33,8 +66,7 @@ class Api extends AbstractApi {
         }
 
         // Send request
-        $response = $this->httpClient->post(
-            sprintf('%s/%s', $this->baseUrl,self::AUTH_ENDPOINT),
+        $response = self::$httpClient->post(self::TOKEN_REQUEST_ENDPOINT,
             [
                 'json' => [
                     'username' => $credential['username'],
@@ -46,6 +78,7 @@ class Api extends AbstractApi {
             ]
         );
 
+        // Check HTTP status code response
         if ($response->getStatusCode() == '200') {
             return new Token(
                 json_decode($response->getBody()->getContents())->token
@@ -56,25 +89,24 @@ class Api extends AbstractApi {
     }
 
     /**
-     * Verify access token
+     * Verify whether given token is valid or not
      *
-     * @param $token
+     * @param Token $token
      * @return bool
      * @throws ValidationException
      */
-    public function verify(Token $token)
+    public static function verify(Token $token)
     {
         // Token validation
-        if(! ($token instanceof Token)) {
-            throw new ValidationException("invalid token");
+        if( ! ($token instanceof Token)) {
+            throw new ValidationException("invalid token type");
         }
 
         // Verify
-        $response = $this->httpClient->post(
-            sprintf('%s/%s', $this->baseUrl,self::VERIFY_ENDPOINT),
+        $response = self::$httpClient->post(self::TOKEN_VERIFY_ENDPOINT,
             [
                 'json' => [
-                    'token' => $token->getToken(),
+                    'token' => $token->string(),
                 ],
                 'headers' => [
                     'Content-Type' => 'application/json'
@@ -88,4 +120,5 @@ class Api extends AbstractApi {
 
         return false;
     }
+
 }
