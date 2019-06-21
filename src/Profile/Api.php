@@ -3,7 +3,7 @@
 namespace DynEd\Neo\Profile;
 
 use DynEd\Neo\AbstractApi;
-use DynEd\Neo\AccessToken\Token;
+use DynEd\Neo\Auth\Token;
 use DynEd\Neo\Exceptions\ValidationException;
 
 class Api extends AbstractApi {
