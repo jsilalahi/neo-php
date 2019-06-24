@@ -5,6 +5,7 @@ use DynEd\Neo\Auth\Auth;
 use DynEd\Neo\HttpClients\GuzzleHttpClient;
 use DynEd\Neo\Exceptions\ValidationException;
 use DynEd\Neo\Auth\Token;
+use Tightenco\Collect\Support\Collection;
 
 class AuthTest extends TestCase
 {
@@ -84,6 +85,34 @@ class AuthTest extends TestCase
         $valid = Auth::verify($token);
 
         $this->assertTrue($valid);
+    }
+
+    public function testAuthUser()
+    {
+        $token = Auth::token([
+            'username' => $this->ssoUsername,
+            'password' => $this->ssoPassword
+        ]);
+
+        $user = Auth::user($token);
+
+        $this->assertObjectHasAttribute("acl", $user);
+        $this->assertObjectHasAttribute("profile", $user);
+    }
+
+    public function testAuthLogin()
+    {
+        $user = Auth::login([
+            'username' => $this->ssoUsername,
+            'password' => $this->ssoPassword
+        ]);
+
+        $this->assertTrue(Auth::verify($user->token()));
+        $this->assertInstanceOf(Token::class, $user->token());
+        $this->assertInstanceOf(Collection::class, $user->acl());
+        $this->assertInstanceOf(Collection::class, $user->profile());
+        $this->assertEquals('super_admin', $user->profile()->get('roles')[0]);
+        $this->assertEquals('super_admin', $user->profile("roles")[0]);
     }
 }
 
