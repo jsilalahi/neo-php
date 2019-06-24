@@ -10,25 +10,53 @@ use Rakit\Validation\Validator;
 class Auth {
 
     /**
-     * SSO token request endpoint
+     * Endpoint to request token from SSO service
      *
      * var @string
      */
     const TOKEN_REQUEST_ENDPOINT = "/api/v1/jwt/token-request";
 
     /**
-     * SSO token verify endpoint
+     * Endpoint to verify token from SSO service
      *
      * var @string
      */
     const TOKEN_VERIFY_ENDPOINT = "/api/v1/jwt/token-verify";
 
     /**
-     * Auth service provider
+     * Endpoint to retrieve user ACL and profile from SSO service
      *
-     * @var Provider
+     * @var string
+     */
+    const USER_ENDPOINT = "/api/v1/sso/user/";
+
+    /**
+     * HTTP client
+     *
+     * @var HttpClientInterface
      */
     private static $httpClient;
+
+    /**
+     * Error message when HTTP client not setup yet
+     *
+     * @var string
+     */
+    private static $errHttpClient = "setup http client";
+
+    /**
+     * Error message when credential is not complete
+     *
+     * @var string
+     */
+    private static $errCredential = "missing credential username or password";
+
+    /**
+     * Error message when token type is miss match
+     *
+     * @var string
+     */
+    private static $errTokenType = "invalid token type";
 
     /**
      * Setup
@@ -41,7 +69,7 @@ class Auth {
     }
 
     /**
-     * Retrieve token from SSO for given credential
+     * Retrieve token from SSO service based on given credential
      *
      * @param array $credential
      * @return Token|null
@@ -51,21 +79,18 @@ class Auth {
     public static function token(array $credential)
     {
         if( ! self::$httpClient) {
-            throw new ConfigurationException("please setup HTTP client first");
+            throw new ConfigurationException(self::$errHttpClient);
         }
 
-        // Credential validation
         $validation = (new Validator)->validate($credential, [
             'username' => 'required',
             'password' => 'required',
         ]);
 
-        // If the credential validation do not pass, then an exception will be thrown
         if ($validation->fails()) {
-            throw new ValidationException("missing credential username or password");
+            throw new ValidationException(self::$errCredential);
         }
 
-        // Send request
         $response = self::$httpClient->post(self::TOKEN_REQUEST_ENDPOINT,
             [
                 'json' => [
@@ -78,7 +103,6 @@ class Auth {
             ]
         );
 
-        // Check HTTP status code response
         if ($response->getStatusCode() == '200') {
             return new Token(
                 json_decode($response->getBody()->getContents())->token
@@ -89,20 +113,23 @@ class Auth {
     }
 
     /**
-     * Verify whether given token is valid or not
+     * Verify given token from SSO service
      *
      * @param Token $token
      * @return bool
+     * @throws ConfigurationException
      * @throws ValidationException
      */
     public static function verify(Token $token)
     {
-        // Token validation
-        if( ! ($token instanceof Token)) {
-            throw new ValidationException("invalid token type");
+        if( ! self::$httpClient) {
+            throw new ConfigurationException(self::$errHttpClient);
         }
 
-        // Verify
+        if( ! ($token instanceof Token)) {
+            throw new ValidationException(self::$errTokenType);
+        }
+
         $response = self::$httpClient->post(self::TOKEN_VERIFY_ENDPOINT,
             [
                 'json' => [
@@ -120,5 +147,49 @@ class Auth {
 
         return false;
     }
+
+    /**
+     * Retrieve user info based on given token
+     *
+     * @param Token $token
+     * @return mixed|null
+     * @throws ValidationException
+     */
+    public static function user(Token $token)
+    {
+        if(! ($token instanceof Token)) {
+            throw new ValidationException(self::$errTokenType);
+        }
+
+        $response = self::$httpClient->get(self::USER_ENDPOINT . $token->parse()->get('payload')->username,
+            [
+                'headers' => [
+                    'X-Dyned-Tkn' => $token->string(),
+                    'Accept' => 'application/json',
+                ]
+            ]
+        );
+
+        if ($response->getStatusCode() == '200') {
+            return json_decode($response->getBody()->getContents());
+        }
+
+        return null;
+    }
+
+//    /**
+//     * Login authorize given credential and returns user (with token, acl and profile)
+//     *
+//     * @param array $credential
+//     * @throws ConfigurationException
+//     * @throws ValidationException
+//     */
+//    public static function login(array $credential)
+//    {
+//        $token = self::token($credential);
+//
+//        $user = self::user($token);
+//    }
+
 
 }
