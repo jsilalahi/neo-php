@@ -177,19 +177,25 @@ class Auth {
         return null;
     }
 
-//    /**
-//     * Login authorize given credential and returns user (with token, acl and profile)
-//     *
-//     * @param array $credential
-//     * @throws ConfigurationException
-//     * @throws ValidationException
-//     */
-//    public static function login(array $credential)
-//    {
-//        $token = self::token($credential);
-//
-//        $user = self::user($token);
-//    }
+    /**
+     * Login authorize given credential and returns user (with token, acl and profile)
+     *
+     * @param array $credential
+     * @return User
+     * @throws ConfigurationException
+     * @throws ValidationException
+     */
+    public static function login(array $credential)
+    {
+        $token = self::token($credential);
+        $user = self::user($token);
+
+        return User::create([
+            'token' => $token,
+            'acl' => $user->acl,
+            'profile' => $user->profile
+        ]);
+    }
 
 
 }
