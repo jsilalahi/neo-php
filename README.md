@@ -3,7 +3,7 @@
 
 NOTE: neo-php still on heavy development. Do not use on production yet.
 
-## Installation
+##### Installation
 
 The easiest way to install neo-php library is using composer
 ```
@@ -80,3 +80,61 @@ $parsed = $token->parse();
 // Get token username from payload
 echo $parsed->get('payload')->username;
 ```
+
+##### Verify
+To verify existing token, you may call verify method and pass the token to verify. Method return boolean whether valid or not.
+
+```php
+<?php
+
+use DynEd\Neo\Auth\Auth;
+
+// Setup Auth HttpClient and retrieve token
+
+$valid = Auth::verify($token);
+echo ($valid) ? "Valid" : "Invalid";
+```
+
+##### User
+To retrieve user ACL and profile from existing token
+
+ ```php
+<?php
+
+use DynEd\Neo\Auth\Auth;
+
+// Setup Auth HttpClient and retrieve token
+
+$user = Auth::user($token);
+var_dump($user->acl);
+var_dump($user->profile);
+```
+ 
+ 
+##### Login
+Login return User (DynEd\Neo\Auth\User) by passing credential. The user contain information about token, ACL and profile.
+
+ ```php
+<?php
+
+use DynEd\Neo\Auth\Auth;
+
+// Setup Auth HttpClient and retrieve token
+
+$user = Auth::login([
+    'username' => 'username',
+    'password' => 'password'
+]);
+
+// Retrieve user's token
+echo $user->token();
+
+// Retrieve user's profile collection
+var_dump($user->profile());
+echo $user->profile()->get('roles')[0];
+echo $user->profile("roles")[0];
+
+// Retrieve user's ACL collection
+var_dump($user->acl());
+```
+ 
