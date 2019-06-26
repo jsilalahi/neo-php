@@ -1,24 +1,17 @@
 <?php
 
-namespace DynEd\Neo;
+namespace DynEd\Neo\Interim;
 
 use DynEd\Neo\HttpClients\HttpClientInterface;
 
-abstract class AbstractApi
-{
+class Applicant {
+
     /**
      * HTTP client
      *
      * @var HttpClientInterface
      */
-    protected static $httpClient;
-
-    /**
-     * Error message when HTTP client not setup yet
-     *
-     * @var string
-     */
-    protected static $errHttpClient = "setup http client";
+    private static $httpClient;
 
     /**
      * Setup
@@ -30,5 +23,8 @@ abstract class AbstractApi
         self::$httpClient = $httpClient;
     }
 
-    protected static function isHttpClientSetup
+    public static function register($email, array $payload)
+    {
+
+    }
 }

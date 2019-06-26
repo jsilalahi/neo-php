@@ -2,12 +2,12 @@
 
 namespace DynEd\Neo\Auth;
 
+use DynEd\Neo\AbstractApi;
 use DynEd\Neo\Exceptions\ConfigurationException;
 use DynEd\Neo\Exceptions\ValidationException;
-use DynEd\Neo\HttpClients\HttpClientInterface;
 use Rakit\Validation\Validator;
 
-class Auth {
+class Auth extends AbstractApi {
 
     /**
      * Endpoint to request token from SSO service
@@ -31,20 +31,6 @@ class Auth {
     const USER_ENDPOINT = "/api/v1/sso/user/";
 
     /**
-     * HTTP client
-     *
-     * @var HttpClientInterface
-     */
-    private static $httpClient;
-
-    /**
-     * Error message when HTTP client not setup yet
-     *
-     * @var string
-     */
-    private static $errHttpClient = "setup http client";
-
-    /**
      * Error message when credential is not complete
      *
      * @var string
@@ -57,16 +43,6 @@ class Auth {
      * @var string
      */
     private static $errTokenType = "invalid token type";
-
-    /**
-     * Setup
-     *
-     * @param HttpClientInterface $httpClient
-     */
-    public static function useHttpClient(HttpClientInterface $httpClient)
-    {
-        self::$httpClient = $httpClient;
-    }
 
     /**
      * Retrieve token from SSO service based on given credential
