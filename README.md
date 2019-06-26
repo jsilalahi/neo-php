@@ -12,10 +12,11 @@ composer require dyned/neo-php
 That's it!
 
 
-### Auth
+### Authentication
+
 
 ##### Setup
-First thing before using `Auth` module, you need to setup HTTP Client implementation. Neo PHP ships `GuzzleHttpClient` as HTTP Client using GuzzleHttp implementation. In case HTTP Client not set up yet, an configuration exception (`DynEd\Neo\Exceptions\ConfigurationException`) thrown.
+First thing before using `Auth` module, you need to setup HTTP Client implementation. Neo PHP ships `GuzzleHttpClient` as HTTP Client using GuzzleHttp implementation. In case Auth module used before HTTP Client set up, an configuration exception (`DynEd\Neo\Exceptions\ConfigurationException`) thrown.
 
 ```php
 <?php 
@@ -33,7 +34,7 @@ Auth::useHttpClient(new GuzzleHttpClient([
 // Now, you can use Auth
 ```
 
-Feel free to using your own HTTP Client implementation as necessary. You need to implement the `DynEd\Neo\HttpClients\HttpClientInterface` and write code for the `get`, `post`, `put`, `patch`, and `delete` method implementation. So the new HTTP Client would look something like this:
+Feel free to using your own HTTP Client implementation as necessary. You may need to implement the `DynEd\Neo\HttpClients\HttpClientInterface` and write code for the `get`, `post`, `put`, `patch`, and `delete` method in your custom implementation. The new custom HTTP Client would look something like this:
 
 ```php
 <?php
@@ -50,7 +51,7 @@ class CustomHttpClient implements HttpClientInterface {
 ```
 
 ##### Token
-Token retrieves JWT token from SSO service based on given credential. The method accept credential in array consist of `username` and `password`. In case credential is missing, an validation exception (`DynEd\Neo\Exceptions\ValidationException`) thrown. This method return Token (`DynEd\Neo\Auth\Token`).
+Token retrieves JWT from SSO service based on given credential. The method accept credential in array consist of `username` and `password`. In case credential is missing, an validation exception (`DynEd\Neo\Exceptions\ValidationException`) thrown. This method return Token (`DynEd\Neo\Auth\Token`).
 
 ```php
 <?php
@@ -73,7 +74,7 @@ echo $token;
 echo $token->string();
 
 // Retrieve JWT token decoded
-// The returned data is collection (\Tightenco\Collect\Support\Collection)
+// The returned data is in collection (\Tightenco\Collect\Support\Collection)
 // Which is same collection with Laravel using
 $parsed = $token->parse();
 
@@ -82,37 +83,37 @@ echo $parsed->get('payload')->username;
 ```
 
 ##### Verify
-To verify existing token, you may call verify method and pass the token to verify. Method return boolean whether valid or not.
+To verify existing token, you may call verify method and pass the token to verify. The method return boolean whether valid or not.
 
 ```php
 <?php
 
 use DynEd\Neo\Auth\Auth;
 
-// Setup Auth HttpClient and retrieve token
+// Setup Auth HttpClient and retrieve token from any source
 
 $valid = Auth::verify($token);
 echo ($valid) ? "Valid" : "Invalid";
 ```
 
 ##### User
-To retrieve user ACL and profile from existing token
+Retrieve user ACL and profile from existing token.
 
  ```php
 <?php
 
 use DynEd\Neo\Auth\Auth;
 
-// Setup Auth HttpClient and retrieve token
+// Setup Auth HttpClient and retrieve token from any source
 
 $user = Auth::user($token);
 var_dump($user->acl);
 var_dump($user->profile);
 ```
- 
+
  
 ##### Login
-Login return User (DynEd\Neo\Auth\User) by passing credential. The user contain information about token, ACL and profile.
+Login return User (`DynEd\Neo\Auth\User`) by passing credential. The user contain information about token, ACL and profile.
 
  ```php
 <?php
