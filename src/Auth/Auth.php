@@ -5,7 +5,6 @@ namespace DynEd\Neo\Auth;
 use DynEd\Neo\AbstractApi;
 use DynEd\Neo\Exceptions\ConfigurationException;
 use DynEd\Neo\Exceptions\ValidationException;
-use Rakit\Validation\Validator;
 
 class Auth extends AbstractApi {
 
@@ -54,18 +53,12 @@ class Auth extends AbstractApi {
      */
     public static function token(array $credential)
     {
-        if( ! self::$httpClient) {
-            throw new ConfigurationException(self::$errHttpClient);
-        }
+        self::httpClientSetOrFail();
 
-        $validation = (new Validator)->validate($credential, [
+        self::validate($credential, [
             'username' => 'required',
             'password' => 'required',
-        ]);
-
-        if ($validation->fails()) {
-            throw new ValidationException(self::$errCredential);
-        }
+        ], self::$errCredential);
 
         $response = self::$httpClient->post(self::TOKEN_REQUEST_ENDPOINT,
             [
@@ -98,9 +91,7 @@ class Auth extends AbstractApi {
      */
     public static function verify(Token $token)
     {
-        if( ! self::$httpClient) {
-            throw new ConfigurationException(self::$errHttpClient);
-        }
+        self::httpClientSetOrFail();
 
         if( ! ($token instanceof Token)) {
             throw new ValidationException(self::$errTokenType);
@@ -129,10 +120,13 @@ class Auth extends AbstractApi {
      *
      * @param Token $token
      * @return mixed|null
+     * @throws ConfigurationException
      * @throws ValidationException
      */
     public static function user(Token $token)
     {
+        self::httpClientSetOrFail();
+
         if(! ($token instanceof Token)) {
             throw new ValidationException(self::$errTokenType);
         }
@@ -163,6 +157,13 @@ class Auth extends AbstractApi {
      */
     public static function login(array $credential)
     {
+        self::httpClientSetOrFail();
+
+        self::validate($credential, [
+            'username' => 'required',
+            'password' => 'required',
+        ], self::$errCredential);
+
         $token = self::token($credential);
         $user = self::user($token);
 
