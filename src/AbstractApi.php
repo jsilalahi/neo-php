@@ -2,52 +2,73 @@
 
 namespace DynEd\Neo;
 
-use DynEd\Neo\HttpClients\GuzzleHttpClient;
+use DynEd\Neo\Exceptions\ConfigurationException;
+use DynEd\Neo\Exceptions\ValidationException;
 use DynEd\Neo\HttpClients\HttpClientInterface;
+use Rakit\Validation\Validator;
 
 abstract class AbstractApi
 {
-    /** @var HttpClientInterface */
-    protected $httpClient;
-
-    /** @var string */
-    protected $baseUrl;
-
     /**
-     * AbstractApi constructor
+     * HTTP client
      *
-     * @param $baseUrl
-     * @param $httpClient
+     * @var HttpClientInterface
      */
-    public function __construct($baseUrl = null, HttpClientInterface $httpClient = null)
-    {
-        $this->baseUrl = $baseUrl;
-        $this->httpClient = ($httpClient) ?: new GuzzleHttpClient();
-    }
+    protected static $httpClient;
 
     /**
-     * Set HttpClient
+     * Error message when HTTP client not setup yet
+     *
+     * @var string
+     */
+    protected static $errHttpClient = "setup http client";
+
+    /**
+     * Setup
      *
      * @param HttpClientInterface $httpClient
-     * @return $this
      */
-    public function setHttpClient(HttpClientInterface $httpClient)
+    public static function useHttpClient(HttpClientInterface $httpClient)
     {
-        $this->httpClient = $httpClient;
-
-        return $this;
+        self::$httpClient = $httpClient;
     }
 
     /**
-     * Set base URL
+     * Check if HttpClient is set
      *
-     * @param $baseUrl
-     * @return $this
+     * @return bool
      */
-    public function setBaseUrl($baseUrl)
+    protected static function isHttpClientSet()
     {
-        $this->baseUrl = $baseUrl;
+        return (self::$httpClient) ? true : false;
+    }
 
-        return $this;
+    /**
+     * Check if HttpClient is set or throw exception
+     *
+     * @throws ConfigurationException
+     */
+    protected static function httpClientSetOrFail()
+    {
+        if( ! self::isHttpClientSet()) {
+            throw new ConfigurationException(self::$errHttpClient);
+        }
+    }
+
+    /**
+     * Validation
+     *
+     * @param $input mixed
+     * @param $rules array
+     * @param string $message string
+     * @throws ValidationException
+     */
+    protected static function validate($input, $rules, $message = "input does not pass validation")
+    {
+        $validation = (new Validator)->validate($input, $rules);
+
+        if ($validation->fails()) {
+            throw new ValidationException($message);
+        }
     }
 }

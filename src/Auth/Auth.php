@@ -2,12 +2,11 @@
 
 namespace DynEd\Neo\Auth;
 
+use DynEd\Neo\AbstractApi;
 use DynEd\Neo\Exceptions\ConfigurationException;
 use DynEd\Neo\Exceptions\ValidationException;
-use DynEd\Neo\HttpClients\HttpClientInterface;
-use Rakit\Validation\Validator;
 
-class Auth {
+class Auth extends AbstractApi {
 
     /**
      * Endpoint to request token from SSO service
@@ -31,20 +30,6 @@ class Auth {
     const USER_ENDPOINT = "/api/v1/sso/user/";
 
     /**
-     * HTTP client
-     *
-     * @var HttpClientInterface
-     */
-    private static $httpClient;
-
-    /**
-     * Error message when HTTP client not setup yet
-     *
-     * @var string
-     */
-    private static $errHttpClient = "setup http client";
-
-    /**
      * Error message when credential is not complete
      *
      * @var string
@@ -59,16 +44,6 @@ class Auth {
     private static $errTokenType = "invalid token type";
 
     /**
-     * Setup
-     *
-     * @param HttpClientInterface $httpClient
-     */
-    public static function useHttpClient(HttpClientInterface $httpClient)
-    {
-        self::$httpClient = $httpClient;
-    }
-
-    /**
      * Retrieve token from SSO service based on given credential
      *
      * @param array $credential
@@ -78,18 +53,12 @@ class Auth {
      */
     public static function token(array $credential)
     {
-        if( ! self::$httpClient) {
-            throw new ConfigurationException(self::$errHttpClient);
-        }
+        self::httpClientSetOrFail();
 
-        $validation = (new Validator)->validate($credential, [
+        self::validate($credential, [
             'username' => 'required',
             'password' => 'required',
-        ]);
-
-        if ($validation->fails()) {
-            throw new ValidationException(self::$errCredential);
-        }
+        ], self::$errCredential);
 
         $response = self::$httpClient->post(self::TOKEN_REQUEST_ENDPOINT,
             [
@@ -122,9 +91,7 @@ class Auth {
      */
     public static function verify(Token $token)
     {
-        if( ! self::$httpClient) {
-            throw new ConfigurationException(self::$errHttpClient);
-        }
+        self::httpClientSetOrFail();
 
         if( ! ($token instanceof Token)) {
             throw new ValidationException(self::$errTokenType);
@@ -153,10 +120,13 @@ class Auth {
      *
      * @param Token $token
      * @return mixed|null
+     * @throws ConfigurationException
      * @throws ValidationException
      */
     public static function user(Token $token)
     {
+        self::httpClientSetOrFail();
+
         if(! ($token instanceof Token)) {
             throw new ValidationException(self::$errTokenType);
         }
@@ -187,6 +157,13 @@ class Auth {
      */
     public static function login(array $credential)
     {
+        self::httpClientSetOrFail();
+
+        self::validate($credential, [
+            'username' => 'required',
+            'password' => 'required',
+        ], self::$errCredential);
+
         $token = self::token($credential);
         $user = self::user($token);
 
