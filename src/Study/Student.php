@@ -13,14 +13,14 @@ class Student extends AbstractApi
      *
      * @var string
      */
-    const STUDENTS_ENDPOINT = '/api/v1/dsa/report/student';
+    const STUDENTS_ENDPOINT = '/api/v1/dsa/report/student?org_code=%s';
 
     /**
      * Endpoint to retrieve study summary of student in range of period
      *
      * @var string
      */
-    const STUDENT_SUMMARY_ENDPOINT = '/api/v1/dsa/report/student/%s?startime=%s1&amp; endtime=%s';
+    const STUDENT_SUMMARY_ENDPOINT = '/api/v1/dsa/report/student/%s?startime=%s1&endtime=%s';
 
     /**
      * Error message when period is not complete
@@ -40,11 +40,8 @@ class Student extends AbstractApi
     {
         self::httpClientSetOrFail();
 
-        $response = self::$httpClient->post(self::STUDENTS_ENDPOINT,
+        $response = self::$httpClient->get(sprintf(self::STUDENTS_ENDPOINT, $uic),
             [
-                'form_params' => [
-                    'org_code' => $uic,
-                ],
                 'headers' => [
                     'X-DynEd-Tkn' => self::$adminToken->string()
                 ]
@@ -76,7 +73,7 @@ class Student extends AbstractApi
             'end' => 'required|date',
         ], self::$errPeriod);
 
-        $response = self::$httpClient->post(sprintf(self::STUDENT_SUMMARY_ENDPOINT, $username, $period['start'], $period['end']),
+        $response = self::$httpClient->get(sprintf(self::STUDENT_SUMMARY_ENDPOINT, $username, $period['start'], $period['end']),
             [
                 'headers' => [
                     'X-DynEd-Tkn' => self::$adminToken->string()

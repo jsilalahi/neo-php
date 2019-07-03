@@ -28,38 +28,37 @@ class StudyStudentTest extends TestCase
         ]));
     }
 
-    public function testStudyAdminStudentsSummaryOrganisation()
+    public function testStudyStudentsOfOrganisation()
     {
         $adminToken = Auth::token([
             'username' => $this->ssoUsername,
             'password' => $this->ssoPassword
         ]);
 
-        Student::setAdminToken($adminToken);
+        Student::useAdminToken($adminToken);
 
         $students = Student::organisation('001');
 
-        $this->assertNull($students);
+        $this->assertNotNull($students);
     }
 
-//    public function testStudyAdminStudentSummaryPeriod()
-//    {
-//        $adminToken = Auth::token([
-//            'username' => $this->ssoUsername,
-//            'password' => $this->ssoPassword
-//        ]);
-//
-//        Admin::setAdminToken($adminToken);
-//
-//        $students = Admin::studentsSummaryOrganisation('001');
-//
-//        $this->assertNotNull($students->data[0]->username);
-//
-//        $summary = Admin::studentSummaryPeriod($students->data[0]->username, ['start' => '2018-01-01', 'end' => '2020-01-01']);
-//
-//        $this->assertNotNull($summary);
-//    }
+    public function testStudyStudentSummary()
+    {
+        $adminToken = Auth::token([
+            'username' => $this->ssoUsername,
+            'password' => $this->ssoPassword
+        ]);
 
+        Student::useAdminToken($adminToken);
+
+        $students = Student::organisation('001');
+
+        $this->assertNotNull($students);
+
+        $summary = Student::summary($students->data[0]->username, ['start' => '2018-01-01', 'end' => '2020-01-01']);
+
+        $this->assertNotNull($summary);
+    }
 }
 
 

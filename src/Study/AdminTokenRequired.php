@@ -11,7 +11,7 @@ trait AdminTokenRequired
      *
      * @var Token
      */
-    protected static $adminToken;
+    public static $adminToken;
 
     /**
      * Set admin token

@@ -8,9 +8,10 @@ interface HttpClientInterface
      * Get
      *
      * @param $uri
+     * @param array $options
      * @return mixed
      */
-    public function get($uri);
+    public function get($uri, array $options = []);
 
     /**
      * Post
