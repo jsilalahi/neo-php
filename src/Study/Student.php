@@ -3,58 +3,44 @@
 namespace DynEd\Neo\Study;
 
 use DynEd\Neo\AbstractApi;
-use DynEd\Neo\Auth\Token;
 
-class Admin extends AbstractApi {
+class Student extends AbstractApi
+{
+    use AdminTokenRequired;
 
     /**
-     * Endpoint to retrieve students summary report per organisation
+     * Endpoint to retrieve students from organisation
      *
-     * var @string
+     * @var string
      */
-    const STUDENTS_SUMMARY_ORGANISATION_ENDPOINT = "/api/v1/dsa/report/student-summary-report";
+    const STUDENTS_ENDPOINT = '/api/v1/dsa/report/student';
 
     /**
-     * Endpoint to retrieve student summary report for period
+     * Endpoint to retrieve study summary of student in range of period
+     *
+     * @var string
      */
-    const STUDENT_SUMMARY_PERIOD_ENDPOINT = "/api/v1/dsa/admin/student-summary/%s?startime=%s&endtime=%s";
+    const STUDENT_SUMMARY_ENDPOINT = '/api/v1/dsa/report/student/%s?startime=%s1&amp; endtime=%s';
 
     /**
      * Error message when period is not complete
      *
      * @var string
      */
-    private static $errCredential = "missing or invalid period start or end";
+    private static $errPeriod = "missing or invalid period start or end";
 
     /**
-     * Admin token
-     *
-     * @var Token
-     */
-    private static $adminToken;
-
-    /**
-     * Set admin token
-     *
-     * @param Token $token
-     */
-    public static function setAdminToken(Token $token)
-    {
-        self::$adminToken = $token;
-    }
-
-    /**
-     * Retrieve students summary report of given $uic organisation
+     * Retrieve student from organisation
      *
      * @param $uic
      * @return mixed|null
      * @throws \DynEd\Neo\Exceptions\ConfigurationException
      */
-    public static function studentsSummaryOrganisation($uic)
+    public static function organisation($uic)
     {
         self::httpClientSetOrFail();
 
-        $response = self::$httpClient->post(self::STUDENTS_SUMMARY_ORGANISATION_ENDPOINT,
+        $response = self::$httpClient->post(self::STUDENTS_ENDPOINT,
             [
                 'form_params' => [
                     'org_code' => $uic,
@@ -73,7 +59,7 @@ class Admin extends AbstractApi {
     }
 
     /**
-     * Retrieve student summary report for given period
+     * Study summary of given student in range of period
      *
      * @param $username
      * @param array $period
@@ -81,16 +67,16 @@ class Admin extends AbstractApi {
      * @throws \DynEd\Neo\Exceptions\ConfigurationException
      * @throws \DynEd\Neo\Exceptions\ValidationException
      */
-    public static function studentSummaryPeriod($username, array $period)
+    public static function summary($username, array $period)
     {
         self::httpClientSetOrFail();
 
         self::validate($period, [
             'start' => 'required|date',
             'end' => 'required|date',
-        ], self::$errCredential);
+        ], self::$errPeriod);
 
-        $response = self::$httpClient->post(sprintf(self::STUDENT_SUMMARY_PERIOD_ENDPOINT, $username, $period['start'], $period['end']),
+        $response = self::$httpClient->post(sprintf(self::STUDENT_SUMMARY_ENDPOINT, $username, $period['start'], $period['end']),
             [
                 'headers' => [
                     'X-DynEd-Tkn' => self::$adminToken->string()
@@ -104,5 +90,4 @@ class Admin extends AbstractApi {
 
         return null;
     }
-
 }
