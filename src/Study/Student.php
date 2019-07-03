@@ -20,7 +20,7 @@ class Student extends AbstractApi
      *
      * @var string
      */
-    const STUDENT_SUMMARY_ENDPOINT = '/api/v1/dsa/report/student/%s?startime=%s1&endtime=%s';
+    const STUDENT_SUMMARY_ENDPOINT = '/api/v1/dsa/report/student/%s?starttime=%s&endtime=%s';
 
     /**
      * Error message when period is not complete
