@@ -13,7 +13,7 @@ class Student extends AbstractApi
      *
      * @var string
      */
-    const STUDENTS_ENDPOINT = '/api/v1/dsa/report/student?org_code=%s';
+    const STUDENTS_ENDPOINT = '/api/v1/dsa/report/student?org_code=%s&page=%s';
 
     /**
      * Endpoint to retrieve study summary of student in range of period
@@ -33,14 +33,15 @@ class Student extends AbstractApi
      * Retrieve student from organisation
      *
      * @param $uic
+     * @param $page
      * @return mixed|null
      * @throws \DynEd\Neo\Exceptions\ConfigurationException
      */
-    public static function organisation($uic)
+    public static function organisation($uic, $page = 1)
     {
         self::httpClientSetOrFail();
 
-        $response = self::$httpClient->get(sprintf(self::STUDENTS_ENDPOINT, $uic),
+        $response = self::$httpClient->get(sprintf(self::STUDENTS_ENDPOINT, $uic, $page),
             [
                 'headers' => [
                     'X-DynEd-Tkn' => self::$adminToken->string()
