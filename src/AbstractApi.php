@@ -37,7 +37,7 @@ abstract class AbstractApi
     {
         $this->httpClient = $httpClient;
 
-        $this->configureDefaults();
+        $this->configure();
     }
 
     /**
@@ -75,27 +75,46 @@ abstract class AbstractApi
     /**
      * Get endpoints
      *
-     * @param null $name
+     * @param null $key
      * @return array|mixed|null
      */
-    public function getEndpoints($name = null)
+    public function getEndpoints($key = null)
     {
-        return $name === null
+        return $key === null
             ? $this->endpoints
-            : (isset($this->endpoints[$name]) ? $this->endpoints[$name] : null);
+            : (isset($this->endpoints[$key]) ? $this->endpoints[$key] : null);
     }
 
     /**
      * Get config
      *
-     * @param null $name
+     * @param null $key
      * @return array|mixed|null
      */
-    public function getConfig($name = null)
+    public function getConfig($key = null)
     {
-        return $name === null
+        return $key === null
             ? $this->config
-            : (isset($this->configs[$name]) ? $this->config[$name] : null);
+            : (isset($this->config[$key]) ? $this->config[$key] : null);
+    }
+
+    /**
+     * Set config
+     *
+     * @param $key
+     * @param null $value
+     */
+    public function setConfig($key, $value = null)
+    {
+        if(is_array($key)) {
+            foreach ($key as $k => $v) {
+                $this->setConfig($k, $v);
+            }
+
+            return;
+        }
+
+        $this->config[$key] = $value;
     }
 
     /**
@@ -103,7 +122,7 @@ abstract class AbstractApi
      *
      * @return void
      */
-    protected function configureDefaults()
+    protected function configure()
     {
         $this->endpoints = [];
         $this->config = [

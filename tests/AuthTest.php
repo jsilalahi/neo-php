@@ -9,21 +9,24 @@ use Tightenco\Collect\Support\Collection;
 
 class AuthTest extends TestCase
 {
-    protected $ssoBaseUri;
-    protected $ssoUsername;
-    protected $ssoPassword;
+    protected $baseUri;
+    protected $username;
+    protected $password;
+    protected $auth;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->ssoBaseUri = getenv("NEO_SSO_BASE_URI");
-        $this->ssoUsername = getenv("NEO_SSO_USERNAME");
-        $this->ssoPassword = getenv("NEO_SSO_PASSWORD");
+        $this->baseUri = getenv("NEO_SSO_BASE_URI");
+        $this->username = getenv("NEO_SSO_USERNAME");
+        $this->password = getenv("NEO_SSO_PASSWORD");
 
-        Auth::useHttpClient(new GuzzleHttpClient([
+        $httpClient = new GuzzleHttpClient([
             'base_uri' => getenv("NEO_SSO_BASE_URI")
-        ]));
+        ]);
+
+        $this->auth = new Auth($httpClient);
     }
 
     public function testAuthTokenValidation_EmptyCredential()
@@ -32,14 +35,14 @@ class AuthTest extends TestCase
             ValidationException::class
         );
 
-        Auth::token([]);
+        $this->auth->token([]);
     }
 
     public function testAuthTokenValidation_InvalidUsername()
     {
-        $token = Auth::token([
+        $token = $this->auth->token([
             'username' => 'invalid',
-            'password' => $this->ssoPassword
+            'password' => $this->password
         ]);
 
         $this->assertNull($token);
@@ -47,8 +50,8 @@ class AuthTest extends TestCase
 
     public function testAuthTokenValidation_PasswordNotMatch()
     {
-        $token = Auth::token([
-            'username' => $this->ssoUsername,
+        $token = $this->auth->token([
+            'username' => $this->username,
             'password' => 'invalid'
         ]);
 
@@ -57,18 +60,50 @@ class AuthTest extends TestCase
 
     public function testAuthTokenCredential()
     {
-        $token = Auth::token([
-            'username' => $this->ssoUsername,
-            'password' => $this->ssoPassword
+        $token = $this->auth->token([
+            'username' => $this->username,
+            'password' => $this->password
         ]);
 
         $this->assertInstanceOf(Token::class, $token);
         $this->assertIsString($token->string());
     }
 
+    public function testAuthTokenCredential_RawResponse()
+    {
+        $this->auth->setConfig('raw_response', false);
+
+        $this->assertEquals(false, $this->auth->getConfig('raw_response'));
+
+        $token = $this->auth->token([
+            'username' => $this->username,
+            'password' => $this->password
+        ]);
+
+        $this->assertInstanceOf(Token::class, $token);
+        $this->assertIsString($token->string());
+
+        $this->auth->setConfig('raw_response', true);
+
+        $this->assertEquals(true, $this->auth->getConfig('raw_response'));
+
+        $token = $this->auth->token([
+            'username' => $this->username,
+            'password' => $this->password
+        ]);
+
+        $this->assertIsString($token);
+
+        $this->auth->setConfig(['raw_response' => false]);
+
+        $this->assertEquals(false, $this->auth->getConfig('raw_response'));
+    }
+
+
+
     public function testAuthTokenVerify_Invalid()
     {
-        $valid = Auth::verify(
+        $valid = $this->auth->verify(
             new Token('invalid')
         );
 
@@ -77,24 +112,24 @@ class AuthTest extends TestCase
 
     public function testAuthTokenVerify_Valid()
     {
-        $token = Auth::token([
-            'username' => $this->ssoUsername,
-            'password' => $this->ssoPassword
+        $token = $this->auth->token([
+            'username' => $this->username,
+            'password' => $this->password
         ]);
 
-        $valid = Auth::verify($token);
+        $valid = $this->auth->verify($token);
 
         $this->assertTrue($valid);
     }
 
     public function testAuthUser()
     {
-        $token = Auth::token([
-            'username' => $this->ssoUsername,
-            'password' => $this->ssoPassword
+        $token = $this->auth->token([
+            'username' => $this->username,
+            'password' => $this->password
         ]);
 
-        $user = Auth::user($token);
+        $user = $this->auth->user($token);
 
         $this->assertObjectHasAttribute("acl", $user);
         $this->assertObjectHasAttribute("profile", $user);
@@ -102,12 +137,12 @@ class AuthTest extends TestCase
 
     public function testAuthLogin()
     {
-        $user = Auth::login([
-            'username' => $this->ssoUsername,
-            'password' => $this->ssoPassword
+        $user = $this->auth->login([
+            'username' => $this->username,
+            'password' => $this->password
         ]);
 
-        $this->assertTrue(Auth::verify($user->token()));
+        $this->assertTrue($this->auth->verify($user->token()));
         $this->assertInstanceOf(Token::class, $user->token());
         $this->assertInstanceOf(Collection::class, $user->acl());
         $this->assertInstanceOf(Collection::class, $user->profile());
