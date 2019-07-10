@@ -22,6 +22,13 @@ abstract class AbstractApi
     protected $endpoints = [];
 
     /**
+     * API configuration
+     *
+     * @var array
+     */
+    protected $config = [];
+
+    /**
      * AbstractApi constructor
      *
      * @param HttpClientInterface $httpClient
@@ -29,6 +36,8 @@ abstract class AbstractApi
     public function __construct(HttpClientInterface $httpClient)
     {
         $this->httpClient = $httpClient;
+
+        $this->configureDefaults();
     }
 
     /**
@@ -63,5 +72,42 @@ abstract class AbstractApi
         }
     }
 
+    /**
+     * Get endpoints
+     *
+     * @param null $name
+     * @return array|mixed|null
+     */
+    public function getEndpoints($name = null)
+    {
+        return $name === null
+            ? $this->endpoints
+            : (isset($this->endpoints[$name]) ? $this->endpoints[$name] : null);
+    }
 
+    /**
+     * Get config
+     *
+     * @param null $name
+     * @return array|mixed|null
+     */
+    public function getConfig($name = null)
+    {
+        return $name === null
+            ? $this->config
+            : (isset($this->configs[$name]) ? $this->config[$name] : null);
+    }
+
+    /**
+     * Configure default value
+     *
+     * @return void
+     */
+    protected function configureDefaults()
+    {
+        $this->endpoints = [];
+        $this->config = [
+            'raw_response' => false
+        ];
+    }
 }
