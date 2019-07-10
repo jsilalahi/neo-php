@@ -81,98 +81,98 @@ class Auth extends AbstractApi {
         return null;
     }
 
-    /**
-     * Verify given token from SSO service
-     *
-     * @param Token $token
-     * @return bool
-     * @throws ConfigurationException
-     * @throws ValidationException
-     */
-    public static function verify(Token $token)
-    {
-        self::httpClientSetOrFail();
-
-        if( ! ($token instanceof Token)) {
-            throw new ValidationException(self::$errTokenType);
-        }
-
-        $response = self::$httpClient->post(self::TOKEN_VERIFY_ENDPOINT,
-            [
-                'json' => [
-                    'token' => $token->string(),
-                ],
-                'headers' => [
-                    'Content-Type' => 'application/json'
-                ]
-            ]
-        );
-
-        if ($response->getStatusCode() == '200') {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Retrieve user info based on given token
-     *
-     * @param Token $token
-     * @return mixed|null
-     * @throws ConfigurationException
-     * @throws ValidationException
-     */
-    public static function user(Token $token)
-    {
-        self::httpClientSetOrFail();
-
-        if(! ($token instanceof Token)) {
-            throw new ValidationException(self::$errTokenType);
-        }
-
-        $response = self::$httpClient->get(self::USER_ENDPOINT . $token->parse()->get('payload')->username,
-            [
-                'headers' => [
-                    'X-Dyned-Tkn' => $token->string(),
-                    'Accept' => 'application/json',
-                ]
-            ]
-        );
-
-        if ($response->getStatusCode() == '200') {
-            return json_decode($response->getBody()->getContents());
-        }
-
-        return null;
-    }
-
-    /**
-     * Login authorize given credential and returns user (with token, acl and profile)
-     *
-     * @param array $credential
-     * @return User
-     * @throws ConfigurationException
-     * @throws ValidationException
-     */
-    public static function login(array $credential)
-    {
-        self::httpClientSetOrFail();
-
-        self::validate($credential, [
-            'username' => 'required',
-            'password' => 'required',
-        ], self::$errCredential);
-
-        $token = self::token($credential);
-        $user = self::user($token);
-
-        return User::create([
-            'token' => $token,
-            'acl' => $user->acl,
-            'profile' => $user->profile
-        ]);
-    }
+//    /**
+//     * Verify given token from SSO service
+//     *
+//     * @param Token $token
+//     * @return bool
+//     * @throws ConfigurationException
+//     * @throws ValidationException
+//     */
+//    public static function verify(Token $token)
+//    {
+//        self::httpClientSetOrFail();
+//
+//        if( ! ($token instanceof Token)) {
+//            throw new ValidationException(self::$errTokenType);
+//        }
+//
+//        $response = self::$httpClient->post(self::TOKEN_VERIFY_ENDPOINT,
+//            [
+//                'json' => [
+//                    'token' => $token->string(),
+//                ],
+//                'headers' => [
+//                    'Content-Type' => 'application/json'
+//                ]
+//            ]
+//        );
+//
+//        if ($response->getStatusCode() == '200') {
+//            return true;
+//        }
+//
+//        return false;
+//    }
+//
+//    /**
+//     * Retrieve user info based on given token
+//     *
+//     * @param Token $token
+//     * @return mixed|null
+//     * @throws ConfigurationException
+//     * @throws ValidationException
+//     */
+//    public static function user(Token $token)
+//    {
+//        self::httpClientSetOrFail();
+//
+//        if(! ($token instanceof Token)) {
+//            throw new ValidationException(self::$errTokenType);
+//        }
+//
+//        $response = self::$httpClient->get(self::USER_ENDPOINT . $token->parse()->get('payload')->username,
+//            [
+//                'headers' => [
+//                    'X-Dyned-Tkn' => $token->string(),
+//                    'Accept' => 'application/json',
+//                ]
+//            ]
+//        );
+//
+//        if ($response->getStatusCode() == '200') {
+//            return json_decode($response->getBody()->getContents());
+//        }
+//
+//        return null;
+//    }
+//
+//    /**
+//     * Login authorize given credential and returns user (with token, acl and profile)
+//     *
+//     * @param array $credential
+//     * @return User
+//     * @throws ConfigurationException
+//     * @throws ValidationException
+//     */
+//    public static function login(array $credential)
+//    {
+//        self::httpClientSetOrFail();
+//
+//        self::validate($credential, [
+//            'username' => 'required',
+//            'password' => 'required',
+//        ], self::$errCredential);
+//
+//        $token = self::token($credential);
+//        $user = self::user($token);
+//
+//        return User::create([
+//            'token' => $token,
+//            'acl' => $user->acl,
+//            'profile' => $user->profile
+//        ]);
+//    }
 
 
 }

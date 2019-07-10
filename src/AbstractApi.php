@@ -3,9 +3,7 @@
 namespace DynEd\Neo;
 
 use DynEd\Neo\Exceptions\ConfigurationException;
-use DynEd\Neo\Exceptions\ValidationException;
 use DynEd\Neo\HttpClients\HttpClientInterface;
-use Rakit\Validation\Validator;
 
 abstract class AbstractApi
 {
@@ -14,61 +12,56 @@ abstract class AbstractApi
      *
      * @var HttpClientInterface
      */
-    protected static $httpClient;
+    protected $httpClient = null;
 
     /**
-     * Error message when HTTP client not setup yet
+     * API endpoints
      *
-     * @var string
+     * @var array
      */
-    protected static $errHttpClient = "setup http client";
+    protected $endpoints = [];
 
     /**
-     * Setup
+     * AbstractApi constructor
      *
      * @param HttpClientInterface $httpClient
      */
-    public static function useHttpClient(HttpClientInterface $httpClient)
+    public function __construct(HttpClientInterface $httpClient)
     {
-        self::$httpClient = $httpClient;
+        $this->httpClient = $httpClient;
     }
 
     /**
-     * Check if HttpClient is set
+     * Setup HTTP client
+     *
+     * @param HttpClientInterface $httpClient
+     */
+    public function useHttpClient(HttpClientInterface $httpClient)
+    {
+        $this->httpClient = $httpClient;
+    }
+
+    /**
+     * Check whether HTTP client set
      *
      * @return bool
      */
-    protected static function isHttpClientSet()
+    protected function isHttpClientSet()
     {
-        return (self::$httpClient) ? true : false;
+        return ($this->httpClient) ? true : false;
     }
 
     /**
-     * Check if HttpClient is set or throw exception
+     * Check whether HTTP client set or throw an exception
      *
      * @throws ConfigurationException
      */
-    protected static function httpClientSetOrFail()
+    protected function httpClientSetOrFail()
     {
-        if( ! self::isHttpClientSet()) {
-            throw new ConfigurationException(self::$errHttpClient);
+        if( ! $this->isHttpClientSet()) {
+            throw new ConfigurationException("missing http client");
         }
     }
 
-    /**
-     * Validation
-     *
-     * @param $input mixed
-     * @param $rules array
-     * @param string $message string
-     * @throws ValidationException
-     */
-    protected static function validate($input, $rules, $message = "input does not pass validation")
-    {
-        $validation = (new Validator)->validate($input, $rules);
 
-        if ($validation->fails()) {
-            throw new ValidationException($message);
-        }
-    }
 }
