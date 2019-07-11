@@ -1,5 +1,5 @@
 # Authentication
-
+This module is implementation and wrapper library for SSO.
 
 ##### Setup
 First thing before using `Auth` module, you need to setup HTTP Client implementation. Neo PHP ships `GuzzleHttpClient` as HTTP Client using GuzzleHttp implementation. In case Auth module used before HTTP Client set up, an configuration exception (`DynEd\Neo\Exceptions\ConfigurationException`) thrown.
@@ -12,10 +12,13 @@ require "vendor/autoload.php";
 use DynEd\Neo\Auth\Auth;
 use DynEd\Neo\HttpClients\GuzzleHttpClient;
 
-// Setup Auth using GuzzleHttpClient implementation
-Auth::useHttpClient(new GuzzleHttpClient([
+// Setup HTTP client
+$httpClient = new GuzzleHttpClient([
     'base_uri' => "https://domain.com"
-]));
+]);
+
+// Setup Auth using GuzzleHttpClient implementation
+$auth = new Auth($httpClient);
 
 // Now, you can use Auth
 ```
@@ -45,12 +48,15 @@ Token retrieves JWT from SSO service based on given credential. The method accep
 use DynEd\Neo\Auth\Auth;
 use DynEd\Neo\HttpClients\GuzzleHttpClient;
 
-// Setup Auth using GuzzleHttpClient implementation
-Auth::useHttpClient(new GuzzleHttpClient([
+// Setup HTTP client
+$httpClient = new GuzzleHttpClient([
     'base_uri' => "https://domain.com"
-]));
+]);
 
-$token = Auth::token([
+// Setup Auth using GuzzleHttpClient implementation
+$auth = new Auth($httpClient);
+
+$token = $auth->token([
     'username' => 'username',
     'password' => 'password'
 ]);
@@ -78,7 +84,7 @@ use DynEd\Neo\Auth\Auth;
 
 // Setup Auth HttpClient and retrieve token from any source
 
-$valid = Auth::verify($token);
+$valid = $auth->verify($token);
 echo ($valid) ? "Valid" : "Invalid";
 ```
 
@@ -92,7 +98,7 @@ use DynEd\Neo\Auth\Auth;
 
 // Setup Auth HttpClient and retrieve token from any source
 
-$user = Auth::user($token);
+$user = $auth->user($token);
 var_dump($user->acl);
 var_dump($user->profile);
 ```
@@ -108,7 +114,7 @@ use DynEd\Neo\Auth\Auth;
 
 // Setup Auth HttpClient and retrieve token
 
-$user = Auth::login([
+$user = $auth->login([
     'username' => 'username',
     'password' => 'password'
 ]);

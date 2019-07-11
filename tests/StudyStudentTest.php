@@ -37,9 +37,7 @@ class StudyStudentTest extends TestCase
             'password' => $this->ssoPassword
         ]);
 
-        $this->student->useAdminToken($adminToken);
-
-        $students = $this->student->organisation('001');
+        $students = $this->student->useAdminToken($adminToken)->organisation('001');
 
         $this->assertNotNull($students);
     }
@@ -51,9 +49,7 @@ class StudyStudentTest extends TestCase
             'password' => $this->ssoPassword
         ]);
 
-        $this->student->useAdminToken($adminToken);
-
-        $students = $this->student->organisation('001');
+        $students = $this->student->useAdminToken($adminToken)->organisation('001');
 
         $this->assertNotNull($students);
 
