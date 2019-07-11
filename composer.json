@@ -12,7 +12,10 @@
     "autoload": {
         "psr-4": {
             "DynEd\\Neo\\": "src/"
-        }
+        },
+        "files": [
+            "src/Helpers/string.php"
+        ]
     },
     "require": {
         "ext-json": "*",
