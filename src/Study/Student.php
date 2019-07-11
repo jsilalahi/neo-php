@@ -3,57 +3,61 @@
 namespace DynEd\Neo\Study;
 
 use DynEd\Neo\AbstractApi;
+use DynEd\Neo\AdminTokenTrait;
+use DynEd\Neo\Exceptions\ValidationException;
+use Rakit\Validation\Validator;
 
 class Student extends AbstractApi
 {
-    use AdminTokenRequired;
+    use AdminTokenTrait;
 
     /**
-     * Endpoint to retrieve students from organisation
+     * Configure default value
      *
-     * @var string
+     * @return void
      */
-    const STUDENTS_ENDPOINT = '/api/v1/dsa/report/student?org_code=%s&page=%s';
+    protected function configure()
+    {
+        parent::configure();
+
+        $this->endpoints = [
+            'organisation' => '/api/v1/dsa/report/student?org_code=%s&page=%s',
+            'summary' => '/api/v1/dsa/report/student/%s?starttime=%s&endtime=%s'
+        ];
+    }
 
     /**
-     * Endpoint to retrieve study summary of student in range of period
-     *
-     * @var string
-     */
-    const STUDENT_SUMMARY_ENDPOINT = '/api/v1/dsa/report/student/%s?starttime=%s&endtime=%s';
-
-    /**
-     * Error message when period is not complete
-     *
-     * @var string
-     */
-    private static $errPeriod = "missing or invalid period start or end";
-
-    /**
-     * Retrieve student from organisation
+     * Retrieve students from organisation
      *
      * @param $uic
      * @param $page
      * @return mixed|null
      * @throws \DynEd\Neo\Exceptions\ConfigurationException
      */
-    public static function organisation($uic, $page = 1)
+    public function organisation($uic, $page = 1)
     {
-        self::httpClientSetOrFail();
+        $this->httpClientSetOrFail();
 
-        $response = self::$httpClient->get(sprintf(self::STUDENTS_ENDPOINT, $uic, $page),
+        $response = $this->httpClient->get(
+            sprintf($this->getEndpoints('organisation'), $uic, $page),
             [
                 'headers' => [
-                    'X-DynEd-Tkn' => self::$adminToken->string()
+                    'X-DynEd-Tkn' => $this->adminToken->string()
                 ]
             ]
         );
 
-        if ($response->getStatusCode() == '200') {
-            return  json_decode($response->getBody()->getContents());
+        if ($response->getStatusCode() != '200') {
+            return null;
         }
 
-        return null;
+        $raw = $response->getBody()->getContents();
+
+        if($this->getConfig('raw_response')) {
+            return $raw;
+        }
+
+        return json_decode($raw);
     }
 
     /**
@@ -65,27 +69,38 @@ class Student extends AbstractApi
      * @throws \DynEd\Neo\Exceptions\ConfigurationException
      * @throws \DynEd\Neo\Exceptions\ValidationException
      */
-    public static function summary($username, array $period)
+    public function summary($username, array $period)
     {
-        self::httpClientSetOrFail();
+        $this->httpClientSetOrFail();
 
-        self::validate($period, [
+        $validation = (new Validator)->validate($period, [
             'start' => 'required|date',
             'end' => 'required|date',
-        ], self::$errPeriod);
+        ]);
 
-        $response = self::$httpClient->get(sprintf(self::STUDENT_SUMMARY_ENDPOINT, $username, $period['start'], $period['end']),
+        if ($validation->fails()) {
+            throw new ValidationException("missing or invalid period start or end");
+        }
+
+        $response = $this->httpClient->get(
+            sprintf($this->getEndpoints('summary'), $username, $period['start'], $period['end']),
             [
                 'headers' => [
-                    'X-DynEd-Tkn' => self::$adminToken->string()
+                    'X-DynEd-Tkn' => $this->adminToken->string()
                 ]
             ]
         );
 
-        if ($response->getStatusCode() == '200') {
-            return  json_decode($response->getBody()->getContents());
+        if ($response->getStatusCode() != '200') {
+            return null;
         }
 
-        return null;
+        $raw = $response->getBody()->getContents();
+
+        if($this->getConfig('raw_response')) {
+            return $raw;
+        }
+
+        return json_decode($raw);
     }
 }
