@@ -10,7 +10,9 @@ use Rakit\Validation\Validator;
 class Auth extends AbstractApi
 {
     /**
-     * @inheritDoc
+     * Configure default value
+     *
+     * @return void
      */
     protected function configure()
     {

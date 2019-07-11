@@ -5,13 +5,25 @@ namespace DynEd\Neo\Auth;
 use Tightenco\Collect\Support\Collection;
 
 class User {
-    /** @var Token */
+    /**
+     * User token
+     *
+     * @var Token
+     */
     protected $token;
 
-    /** @var Collection */
+    /**
+     * User ACL
+     *
+     * @var Collection
+     */
     protected $acl;
 
-    /** @var Collection */
+    /**
+     * User profile
+     *
+     * @var Collection
+     */
     protected $profile;
 
     /**
@@ -39,8 +51,22 @@ class User {
     public static function create(array $data)
     {
         $token = $data['token'];
-        $acl = collect(json_decode(json_encode($data['acl']), true));
-        $profile = collect(json_decode(json_encode($data['profile']), true));
+
+        $acl = collect(
+            json_decode(
+                json_encode(
+                    $data['acl']
+                ), true
+            )
+        );
+
+        $profile = collect(
+            json_decode(
+                json_encode(
+                    $data['profile']
+                ), true
+            )
+        );
 
         return new User($token, $acl, $profile);
     }
