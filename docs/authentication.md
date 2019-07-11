@@ -1,8 +1,8 @@
 # Authentication
-This module is implementation and wrapper library for SSO.
+Authentication module is implementation and API wrapper for SSO service.
 
 ##### Setup
-First thing before using `Auth` module, you need to setup HTTP Client implementation. Neo PHP ships `GuzzleHttpClient` as HTTP Client using GuzzleHttp implementation. In case Auth module used before HTTP Client set up, an configuration exception (`DynEd\Neo\Exceptions\ConfigurationException`) thrown.
+First thing before using `Auth` module, you need to setup service HTTP Client. Neo PHP ships `GuzzleHttpClient` as default HTTP Client using GuzzleHttp implementation. In case of Auth module used before HTTP Client set up, an configuration exception (`DynEd\Neo\Exceptions\ConfigurationException`) will thrown.
 
 ```php
 <?php 
@@ -20,7 +20,7 @@ $httpClient = new GuzzleHttpClient([
 // Setup Auth using GuzzleHttpClient implementation
 $auth = new Auth($httpClient);
 
-// Now, you can use Auth
+// Now, you can use $auth
 ```
 
 Feel free to using your own HTTP Client implementation as necessary. You may need to implement the `DynEd\Neo\HttpClients\HttpClientInterface` and write code for the `get`, `post`, `put`, `patch`, and `delete` method in your custom implementation. The new custom HTTP Client would look something like this:
@@ -40,7 +40,7 @@ class CustomHttpClient implements HttpClientInterface {
 ```
 
 ##### Token
-Token retrieves JWT from SSO service based on given credential. The method accept credential in array consist of `username` and `password`. In case credential is missing, an validation exception (`DynEd\Neo\Exceptions\ValidationException`) thrown. This method return Token (`DynEd\Neo\Auth\Token`).
+Token retrieves JSON Web Token (JWT) from SSO service based on given credential. This method accept credential in array and consist of `username` and `password` keys. In case of credential is missing, an validation exception (`DynEd\Neo\Exceptions\ValidationException`) thrown. This method return Token (`DynEd\Neo\Auth\Token`) type.
 
 ```php
 <?php
@@ -75,7 +75,7 @@ echo $parsed->get('payload')->username;
 ```
 
 ##### Verify
-To verify existing token, you may call verify method and pass the token to verify. The method return boolean whether valid or not.
+Sometimes, you want to verify existing token to SSO service. To do that you may call `verify` method and pass the token (`DynEd\Neo\Auth\Token`) to verify. The method will return boolean whether token is valid or not.
 
 ```php
 <?php
@@ -89,7 +89,7 @@ echo ($valid) ? "Valid" : "Invalid";
 ```
 
 ##### User
-Retrieve user ACL and profile from existing token.
+If you have token (`DynEd\Neo\Auth\Token`) and want to retrieve the user ACL and profile information, you may using `user` method. This method accept token (`DynEd\Neo\Auth\Token`) and will return user's ACL and profile.
 
  ```php
 <?php
@@ -105,7 +105,7 @@ var_dump($user->profile);
 
  
 ##### Login
-Login return User (`DynEd\Neo\Auth\User`) by passing credential. The user contain information about token, ACL and profile.
+A bit different with others method, `login` return User (`DynEd\Neo\Auth\User`) by passing credential. This method return user with more information such as token (`DynEd\Neo\Auth\Token`), ACL and profile.
 
  ```php
 <?php
@@ -131,3 +131,5 @@ echo $user->profile("roles")[0];
 var_dump($user->acl());
 ```
  
+### Feature Request
+If you have any feature request to Auth module, feel free to open issue in this GitHub projects.
