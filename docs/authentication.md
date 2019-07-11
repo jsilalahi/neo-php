@@ -1,7 +1,7 @@
 # Authentication
 Authentication module is implementation and API wrapper for SSO service.
 
-##### Setup
+#### Setup
 First thing before using `Auth` module, you need to setup service HTTP Client. Neo PHP ships `GuzzleHttpClient` as default HTTP Client using GuzzleHttp implementation. In case of Auth module used before HTTP Client set up, an configuration exception (`DynEd\Neo\Exceptions\ConfigurationException`) will thrown.
 
 ```php
@@ -39,7 +39,7 @@ class CustomHttpClient implements HttpClientInterface {
 }
 ```
 
-##### Token
+#### Token
 Token retrieves JSON Web Token (JWT) from SSO service based on given credential. This method accept credential in array and consist of `username` and `password` keys. In case of credential is missing, an validation exception (`DynEd\Neo\Exceptions\ValidationException`) thrown. This method return Token (`DynEd\Neo\Auth\Token`) type.
 
 ```php
@@ -74,7 +74,7 @@ $parsed = $token->parse();
 echo $parsed->get('payload')->username;
 ```
 
-##### Verify
+#### Verify
 Sometimes, you want to verify existing token to SSO service. To do that you may call `verify` method and pass the token (`DynEd\Neo\Auth\Token`) to verify. The method will return boolean whether token is valid or not.
 
 ```php
@@ -88,7 +88,7 @@ $valid = $auth->verify($token);
 echo ($valid) ? "Valid" : "Invalid";
 ```
 
-##### User
+#### User
 If you have token (`DynEd\Neo\Auth\Token`) and want to retrieve the user ACL and profile information, you may using `user` method. This method accept token (`DynEd\Neo\Auth\Token`) and will return user's ACL and profile.
 
  ```php
@@ -104,7 +104,7 @@ var_dump($user->profile);
 ```
 
  
-##### Login
+#### Login
 A bit different with others method, `login` return User (`DynEd\Neo\Auth\User`) by passing credential. This method return user with more information such as token (`DynEd\Neo\Auth\Token`), ACL and profile.
 
  ```php
