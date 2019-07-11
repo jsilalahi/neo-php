@@ -4,7 +4,11 @@ namespace DynEd\Neo\Auth;
 
 class Token
 {
-    /** @var string */
+    /**
+     * Token
+     *
+     * @var string
+     */
     private $token;
 
     /**

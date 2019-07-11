@@ -3,9 +3,7 @@
 namespace DynEd\Neo;
 
 use DynEd\Neo\Exceptions\ConfigurationException;
-use DynEd\Neo\Exceptions\ValidationException;
 use DynEd\Neo\HttpClients\HttpClientInterface;
-use Rakit\Validation\Validator;
 
 abstract class AbstractApi
 {
@@ -14,61 +12,149 @@ abstract class AbstractApi
      *
      * @var HttpClientInterface
      */
-    protected static $httpClient;
+    protected $httpClient = null;
 
     /**
-     * Error message when HTTP client not setup yet
+     * API endpoints
      *
-     * @var string
+     * @var array
      */
-    protected static $errHttpClient = "setup http client";
+    protected $endpoints = [];
 
     /**
-     * Setup
+     * API configuration
+     *
+     * @var array
+     */
+    protected $config = [];
+
+    /**
+     * AbstractApi constructor
+     *
+     * @param HttpClientInterface $httpClient
+     * @param $endpoints
+     * @param $config
+     */
+    public function __construct(HttpClientInterface $httpClient, $endpoints = [], $config = [])
+    {
+        $this->httpClient = $httpClient;
+        $this->endpoints = $endpoints;
+        $this->config = $config;
+
+        $this->configure();
+    }
+
+    /**
+     * Setup HTTP client
      *
      * @param HttpClientInterface $httpClient
      */
-    public static function useHttpClient(HttpClientInterface $httpClient)
+    public function useHttpClient(HttpClientInterface $httpClient)
     {
-        self::$httpClient = $httpClient;
+        $this->httpClient = $httpClient;
     }
 
     /**
-     * Check if HttpClient is set
+     * Check whether HTTP client set
      *
      * @return bool
      */
-    protected static function isHttpClientSet()
+    protected function isHttpClientSet()
     {
-        return (self::$httpClient) ? true : false;
+        return ($this->httpClient) ? true : false;
     }
 
     /**
-     * Check if HttpClient is set or throw exception
+     * Check whether HTTP client set or throw an exception
      *
      * @throws ConfigurationException
      */
-    protected static function httpClientSetOrFail()
+    protected function httpClientSetOrFail()
     {
-        if( ! self::isHttpClientSet()) {
-            throw new ConfigurationException(self::$errHttpClient);
+        if( ! $this->isHttpClientSet()) {
+            throw new ConfigurationException("missing http client");
         }
     }
 
     /**
-     * Validation
+     * Get endpoints
      *
-     * @param $input mixed
-     * @param $rules array
-     * @param string $message string
-     * @throws ValidationException
+     * @param null $key
+     * @return array|mixed|null
      */
-    protected static function validate($input, $rules, $message = "input does not pass validation")
+    public function getEndpoints($key = null)
     {
-        $validation = (new Validator)->validate($input, $rules);
+        return $key === null
+            ? $this->endpoints
+            : (isset($this->endpoints[$key]) ? $this->endpoints[$key] : null);
+    }
 
-        if ($validation->fails()) {
-            throw new ValidationException($message);
+    /**
+     * Set config
+     *
+     * @param $key
+     * @param null $value
+     */
+    public function setEndpoints($key, $value = null)
+    {
+        if(is_array($key)) {
+            foreach ($key as $k => $v) {
+                $this->setEndpoints($k, $v);
+            }
+
+            return;
+        }
+
+        $this->endpoints[$key] = $value;
+    }
+
+    /**
+     * Get config
+     *
+     * @param null $key
+     * @return array|mixed|null
+     */
+    public function getConfig($key = null)
+    {
+        return $key === null
+            ? $this->config
+            : (isset($this->config[$key]) ? $this->config[$key] : null);
+    }
+
+    /**
+     * Set config
+     *
+     * @param $key
+     * @param null $value
+     */
+    public function setConfig($key, $value = null)
+    {
+        if(is_array($key)) {
+            foreach ($key as $k => $v) {
+                $this->setConfig($k, $v);
+            }
+
+            return;
+        }
+
+        $this->config[$key] = $value;
+    }
+
+    /**
+     * Configure default value
+     *
+     * @return void
+     */
+    protected function configure()
+    {
+        if( ! $this->endpoints) {
+            $this->endpoints = [];
+        }
+
+        if( ! $this->endpoints) {
+            $this->config = [
+                'raw_response' => false // By default, API return an object / encoded
+            ];
         }
     }
 }

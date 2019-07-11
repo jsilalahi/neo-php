@@ -11,6 +11,9 @@ class StudyStudentTest extends TestCase
     protected $ssoUsername;
     protected $ssoPassword;
 
+    protected $auth;
+    protected $student;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -19,43 +22,38 @@ class StudyStudentTest extends TestCase
         $this->ssoUsername = getenv("NEO_SSO_USERNAME");
         $this->ssoPassword = getenv("NEO_SSO_PASSWORD");
 
-        Auth::useHttpClient(new GuzzleHttpClient([
+        $httpClient = new GuzzleHttpClient([
             'base_uri' => getenv("NEO_SSO_BASE_URI")
-        ]));
+        ]);
 
-        Student::useHttpClient(new GuzzleHttpClient([
-            'base_uri' => getenv("NEO_SSO_BASE_URI")
-        ]));
+        $this->auth = new Auth($httpClient);
+        $this->student = new Student($httpClient);
     }
 
     public function testStudyStudentsOfOrganisation()
     {
-        $adminToken = Auth::token([
+        $adminToken = $this->auth->token([
             'username' => $this->ssoUsername,
             'password' => $this->ssoPassword
         ]);
 
-        Student::useAdminToken($adminToken);
-
-        $students = Student::organisation('001');
+        $students = $this->student->useAdminToken($adminToken)->organisation('001');
 
         $this->assertNotNull($students);
     }
 
     public function testStudyStudentSummary()
     {
-        $adminToken = Auth::token([
+        $adminToken = $this->auth->token([
             'username' => $this->ssoUsername,
             'password' => $this->ssoPassword
         ]);
 
-        Student::useAdminToken($adminToken);
-
-        $students = Student::organisation('001');
+        $students = $this->student->useAdminToken($adminToken)->organisation('001');
 
         $this->assertNotNull($students);
 
-        $summary = Student::summary($students->data[0]->username, ['start' => '2018-01-01', 'end' => '2020-01-01']);
+        $summary = $this->student->summary($students->data[0]->username, ['start' => '2018-01-01', 'end' => '2020-01-01']);
 
         $this->assertNotNull($summary);
     }

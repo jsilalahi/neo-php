@@ -6,10 +6,18 @@ use GuzzleHttp\Client;
 
 class GuzzleHttpClient implements HttpClientInterface
 {
-    /** @var Client */
+    /**
+     * HTTP client
+     *
+     * @var Client
+     */
     private $client;
 
-    /** @var array */
+    /**
+     * HTTP client config
+     *
+     * @var array
+     */
     private $config = [
         'timeout'  => 5,
         'http_errors' => false,
@@ -29,7 +37,7 @@ class GuzzleHttpClient implements HttpClientInterface
     }
 
     /**
-     * Get request
+     * Get
      *
      * @param $uri
      * @param array $options
@@ -41,7 +49,7 @@ class GuzzleHttpClient implements HttpClientInterface
     }
 
     /**
-     * Post request
+     * Post
      *
      * @param $uri
      * @param array $options
@@ -53,7 +61,7 @@ class GuzzleHttpClient implements HttpClientInterface
     }
 
     /**
-     * Put request
+     * Put
      *
      * @param $uri
      * @param array $options
@@ -65,7 +73,7 @@ class GuzzleHttpClient implements HttpClientInterface
     }
 
     /**
-     * Patch request
+     * Patch
      *
      * @param $uri
      * @param array $options
@@ -77,7 +85,7 @@ class GuzzleHttpClient implements HttpClientInterface
     }
 
     /**
-     * Delete request
+     * Delete
      *
      * @param $uri
      * @return mixed|\Psr\Http\Message\ResponseInterface
