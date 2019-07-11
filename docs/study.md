@@ -1,18 +1,18 @@
 # Study
-This module is implementation and wrapper library for NSA.
+Study module is implementation and API wrapper for NSA service.
 
-##### Setup
-You may need to setup HTTP client before using Study module. Please refer to [authentication documentation](authentication.md) how to setup a client. 
+#### Setup
+You may need to setup HTTP client before using Study module. Please refer to [authentication documentation](authentication.md) how to setup a HTTP client. 
 
-##### Retrieve students from an organisation
-To retrieve students of organisation from NSA, admin token is required. You can retrieve admin token from Auth. This method accept organisation's UIC (Universal Identifier Code) and pagination number.
+#### Students of Organisation
+Use this method to retrieve students of organisation from NSA. This method accept organisation's UIC (Universal Identifier Code) and pagination number (by default, the page is 1). Please keep in mind that this method require an admin. You can retrieve admin token from Auth module. 
 
 ```php
 <?php
 
+use DynEd\Neo\Auth\Token;
 use DynEd\Neo\Study\Student;
 use DynEd\Neo\HttpClients\GuzzleHttpClient;
-use DynEd\Neo\Auth\Token;
 
 // Setup HTTP client
 $httpClient = new GuzzleHttpClient([
@@ -22,21 +22,27 @@ $httpClient = new GuzzleHttpClient([
 // Setup Study using GuzzleHttpClient implementation
 $nsa = new Student($httpClient);
 
-$page = 1; // Specified which page you need to fetch. By default its 1.
-$adminToken = new Token('xxx'); // You may retrieve this from Auth
+// Specified which page you need to fetch. By default it's 1.
+$page = 1; 
+
+// Admin token. You may retrieve this from Auth module
+$adminToken = $auth->token([
+    'username' => 'admin',
+    'password' => 'admin'
+]);
 
 $students= $nsa->useAdminToken($adminToken)->organisation('001', $page);
 ```
 
-##### Retrieve student's summary of study
-To retrieve student's summary of study, admin token is required. You can retrieve admin token from Auth. This method accept student's SSO username (usually an email address) and array of selected period (in date, yyyy-mm-dd format).
+##### Student Study Summary
+Use this method to retrieve student's summary of study. This method accept student's SSO username (usually an email address) and an array of selected period (in date, yyyy-mm-dd format). Please keep in mind that this method require an admin. You can retrieve admin token from Auth module. 
 
 ```php
 <?php
 
+use DynEd\Neo\Auth\Token;
 use DynEd\Neo\Study\Student;
 use DynEd\Neo\HttpClients\GuzzleHttpClient;
-use DynEd\Neo\Auth\Token;
 
 // Setup HTTP client
 $httpClient = new GuzzleHttpClient([
@@ -52,3 +58,6 @@ $adminToken = new Token('xxx'); // You may retrieve this from Auth
 
 $sr = $nsa->useAdminToken($adminToken)->summary($student, $period);
 ```
+
+### Notes
+This module is not complete. Some method may come in future.
