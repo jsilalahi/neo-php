@@ -42,7 +42,7 @@ class StudyStudentTest extends TestCase
         $this->assertNotNull($students);
     }
 
-    public function testStudyStudentSummary()
+    public function testStudyStudentSummary_AdminToken()
     {
         $adminToken = $this->auth->token([
             'username' => $this->ssoUsername,
@@ -50,6 +50,20 @@ class StudyStudentTest extends TestCase
         ]);
 
         $students = $this->student->useAdminToken($adminToken)->organisation('001');
+
+        $this->assertNotNull($students);
+
+        $summary = $this->student->summary($students->data[0]->username, ['start' => '2018-01-01', 'end' => '2020-01-01']);
+
+        $this->assertNotNull($summary);
+    }
+
+    public function testStudyStudentSummary_AdminCredential()
+    {
+        $students = $this->student->useAdminCredential([
+            'username' => $this->ssoUsername,
+            'password' => $this->ssoPassword
+        ])->organisation('001');
 
         $this->assertNotNull($students);
 
