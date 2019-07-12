@@ -4,23 +4,67 @@ namespace DynEd\Neo\Etest;
 
 class Question
 {
-    /** @var int */
+    /**
+     * Question ID
+     *
+     * @var int
+     */
     public $id;
-    /** @var int */
+
+    /**
+     * Answer mode ID
+     *
+     * @var int
+     */
     public $answerModeId;
-    /** @var string */
+
+    /**
+     * Answer mode
+     *
+     * @var string
+     */
     public $answerMode;
-    /** @var string */
+
+    /**
+     * Instructions
+     *
+     * @var string
+     */
     public $instruction;
-    /** @var string */
+
+    /**
+     * Comments
+     *
+     * @var string
+     */
     public $comments;
-    /** @var string */
+
+    /**
+     * Modified by
+     *
+     * @var string
+     */
     public $modifiedBy;
-    /** @var int */
+
+    /**
+     * Question type ID
+     *
+     * @var int
+     */
     public $typeId;
-    /** @var string */
+
+    /**
+     * Created at
+     *
+     * @var string
+     */
     public $createdAt;
-    /** @var string */
+
+    /**
+     * Updated at
+     *
+     * @var string
+     */
     public $updatedAt;
 
     /**

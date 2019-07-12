@@ -4,7 +4,8 @@ namespace DynEd\Neo\Auth;
 
 use Tightenco\Collect\Support\Collection;
 
-class User {
+class User
+{
     /**
      * User token
      *

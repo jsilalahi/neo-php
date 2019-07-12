@@ -32,9 +32,9 @@ class Bank extends AbstractApi
      */
     public function questions()
     {
-        $this->httpClientSetOrFail();
+        $this->httpClientSetOrFail()->adminTokenSetOrFail();
 
-        $response = $this->httpClient->post($this->getEndpoints('question'),
+        $response = $this->httpClient->get($this->getEndpoints('questions'),
             [
                 'headers' => [
                     'Content-Type' => 'application/json',
@@ -54,5 +54,12 @@ class Bank extends AbstractApi
         }
 
         $questions = [];
+        $qs = json_decode($raw, true);
+
+        foreach ($qs as $q) {
+            $questions[] = new Question($q);
+        }
+
+        return collect($questions);
     }
 }
