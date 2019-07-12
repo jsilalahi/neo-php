@@ -30,7 +30,7 @@ class Question
      *
      * @var string
      */
-    public $instruction;
+    public $instructions;
 
     /**
      * Comments
@@ -75,7 +75,7 @@ class Question
     public function __construct(array $data)
     {
         foreach ($data as $key => $value) {
-            $this->{$key} = $value;
+            $this->{camelize($key)} = $value;
         }
     }
 }
