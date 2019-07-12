@@ -14,7 +14,7 @@ composer require dyned/neo-php
 That's it!
 
 #### Documentations
-Please refer to `docs` folder.
+Please refer to [documentations](docs) folder.
 
 
 #### Test
