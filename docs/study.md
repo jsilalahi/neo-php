@@ -31,7 +31,13 @@ $adminToken = $auth->token([
     'password' => 'admin'
 ]);
 
-$students= $nsa->useAdminToken($adminToken)->organisation('001', $page);
+$students = $nsa->useAdminToken($adminToken)->organisation('001', $page);
+
+// Or instead of using admin token, you can using admin credential
+$students = $nsa->useAdminCredential([
+    'username' => 'admin',
+    'password' => 'admin'
+])->organisation('001', $page);
 ```
 
 ##### Student Study Summary
@@ -57,6 +63,12 @@ $period = ['start' => '2018-01-01', 'end' => '2020-01-01'];
 $adminToken = new Token('xxx'); // You may retrieve this from Auth
 
 $sr = $nsa->useAdminToken($adminToken)->summary($student, $period);
+
+// Or instead of using admin token, you can using admin credential
+$sr = $nsa->useAdminToken([
+    'username' => 'admin',
+    'password' => 'admin'
+])->summary($student, $period);
 ```
 
 ### Notes
