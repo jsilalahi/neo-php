@@ -36,7 +36,7 @@ class Student extends AbstractApi
      */
     public function organisation($uic, $page = 1)
     {
-        $this->httpClientSetOrFail();
+        $this->httpClientSetOrFail()->adminTokenSetOrFail();
 
         $response = $this->httpClient->get(
             sprintf($this->getEndpoints('organisation'), $uic, $page),
@@ -71,7 +71,7 @@ class Student extends AbstractApi
      */
     public function summary($username, array $period)
     {
-        $this->httpClientSetOrFail();
+        $this->httpClientSetOrFail()->adminTokenSetOrFail();
 
         $validation = (new Validator)->validate($period, [
             'start' => 'required|date',

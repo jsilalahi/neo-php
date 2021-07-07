@@ -74,6 +74,8 @@ abstract class AbstractApi
         if( ! $this->isHttpClientSet()) {
             throw new ConfigurationException("missing http client");
         }
+
+        return $this;
     }
 
     /**
